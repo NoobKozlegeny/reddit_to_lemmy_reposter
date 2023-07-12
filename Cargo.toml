@@ -12,3 +12,4 @@ tokio = { version = "1.29.0", features = ["full"] } # for our async runtime
 serde = "1.0.171"
 random-string = "1.0.0"
 serde_json = "1.0.102"
+url = "2.4.0"

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use reqwest::{self, header::{HeaderMap, HeaderValue}};
+use reqwest::{self, header::{HeaderMap, HeaderValue, USER_AGENT}};
 // use serde::Deserialize;
 use tokio;
 use serde_json::json;
@@ -25,29 +25,24 @@ async fn reddit_authorize() -> Result<(), reqwest::Error> {
     //     SCOPE_STRING = "read"
     // );
 
+    let url = "https://www.reddit.com/api/v1/access_token/.json";
+    let form = [
+        ("grant_type", "password"),
+        ("username", CLIENT_ID),
+        ("password", CLIENT_SECRET),
+    ];  
+
     let client = reqwest::Client::new();
 
-    let mut body_map = HashMap::new();
-    body_map.insert("grant_type".to_string(), "password".to_string());
-    body_map.insert("username".to_string(), "UltimatePCAddict".to_string());
-    body_map.insert("password".to_string(), "Azolos10".to_string());
-
-    let body_json = json!(body_map).to_string();
-
-    let mut header_map = HeaderMap::new();
-    header_map.insert("User-Agent", HeaderValue::from_static("Reposter/0.0.0 (by u/UltimatePCAddict)"));
-    header_map.insert("Content-Type", HeaderValue::from_static("application/x-www-form-urlencoded"));
-
-    let response = client.post("https://www.reddit.com/api/v1/access_token")
+    let request = client.post(url)
+        .header(USER_AGENT, "linux:reposter:v0.0.1 (by u/UltimatePCAddict)")
         .basic_auth(CLIENT_ID, Some(CLIENT_SECRET))
-        .body(body_json)
-        .headers(header_map)
-        .send()
-        .await?;   
+        .form(&form);
+
+    let response = request.send().await?;
 
     if response.status().is_success() {
-        let xd = response.text().await?;
-        println!("{}", xd)
+        println!("Successful authorization!")
     }
     else {
         println!("{}", response.status().as_str())
