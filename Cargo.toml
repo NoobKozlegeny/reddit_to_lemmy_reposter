@@ -17,3 +17,4 @@ oauth2 = "4.4.1"
 net = "0.1.0"
 open = "5.0.0"
 anyhow = "1.0.71"
+hyper = { version = "0.14.27", features = ["server"] }
