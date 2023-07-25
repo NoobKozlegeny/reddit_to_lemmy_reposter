@@ -1,15 +1,23 @@
-use serde_json::{json, Value, Error};
+use serde_json::Value;
 
 #[tokio::main]
 async fn main() { 
-    let _ = reddit_get_posts("fosttalicska").await;
+    let posts = reddit_get_posts("fosttalicska", 3).await;
+    match &posts {
+        Ok(value) => println!("Successfully fetched posts!"),
+        Err(err) => println!("{}", err),
+    }
+    
+    if let Ok(post) = posts {
+        println!("{:#?}", post);
+    }
 }
 
-async fn reddit_get_posts(subreddit: &str) -> Result<(), Box<dyn std::error::Error>> {
+async fn reddit_get_posts(subreddit: &str, start_idx: usize) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
     // ...
     let url: String = format!("https://www.reddit.com/r/{}/hot.json", subreddit);
     let client = reqwest::Client::new();
-    let posts = client
+    let response = client
         .get(&url)
         .header(reqwest::header::USER_AGENT, "reddit_to_lemmy_reposter (by u/UltimatePCAddict)")
         .send()
@@ -17,7 +25,14 @@ async fn reddit_get_posts(subreddit: &str) -> Result<(), Box<dyn std::error::Err
         .text()
         .await?;
 
-    let v: Value = serde_json::from_str(&posts)?;
-    println!("{}", v["data"]["children"][0]["data"]["title"]);
-    Ok(())
+    let mut response_json: Value = serde_json::from_str(&response)?;
+    println!("{}", response_json["data"]["children"][start_idx]["data"]["title"]);
+    
+    let posts = response_json["data"]["children"].as_array_mut();
+    if posts.is_some() {
+        return Ok(posts.unwrap().clone());
+    }
+    else {
+        return Err(format!("Couldn't get posts from {}", subreddit))?;
+    }
 }
