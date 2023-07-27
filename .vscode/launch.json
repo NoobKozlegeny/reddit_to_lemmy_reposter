@@ -20,7 +20,11 @@
                 }
             },
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "env": { 
+                "NAME_OR_EMAIL": "fostolo_bot",
+                "LEMMY_AUTH_PASSWORD": "^9vBHpNbP9L8Q8*tC9%vW^Cs" 
+            }
         },
         {
             "type": "lldb",

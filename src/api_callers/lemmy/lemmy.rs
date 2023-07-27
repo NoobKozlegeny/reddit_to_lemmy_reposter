@@ -1,0 +1,1 @@
+use lemmy_api_common::post::GetPostsResponse;
