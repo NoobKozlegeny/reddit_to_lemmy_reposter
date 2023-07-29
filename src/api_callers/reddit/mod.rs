@@ -1,1 +1,1 @@
-pub mod reddit_caller;
+pub mod reddit;

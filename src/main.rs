@@ -5,7 +5,7 @@ use reqwest::Client;
 use url::Url;
 
 // Import own modules / Create module tree
-use crate::{api_callers::{reddit::reddit_caller::reddit_get_posts, lemmy::lemmy::create_post}, structs::post::Post};
+use crate::{api_callers::{reddit::reddit::reddit_get_posts, lemmy::lemmy::create_post}, structs::post::Post};
 pub mod api_callers;
 pub mod structs;
 pub mod statics;
