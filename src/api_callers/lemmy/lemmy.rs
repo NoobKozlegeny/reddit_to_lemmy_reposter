@@ -5,7 +5,7 @@ use lemmy_api_common::{sensitive::Sensitive, community::GetCommunity};
 use serde_json::{json, Value};
 use url::Url;
 
-use crate::CLIENT;
+use crate::statics::CLIENT;
 
 pub async fn create_post(
     instance: String,

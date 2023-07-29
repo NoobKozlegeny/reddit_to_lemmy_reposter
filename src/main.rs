@@ -8,10 +8,7 @@ use url::Url;
 use crate::{api_callers::{reddit::reddit_caller::reddit_get_posts, lemmy::lemmy::create_post}, structs::post::Post};
 pub mod api_callers;
 pub mod structs;
-
-pub static CLIENT: Lazy<Client> = Lazy::new(|| {
-    return Client::new();
-});
+pub mod statics;
 
 #[tokio::main]
 async fn main() {
