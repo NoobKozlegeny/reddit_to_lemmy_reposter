@@ -105,36 +105,6 @@ pub async fn create_post(
     return Ok("Successful post!".to_string());
 }
 
-async fn create_post_with_image(
-    instance: String,
-    community: String,
-    name: String,
-    url: String,
-    body: Option<String>
-) -> Result<String, Box<dyn std::error::Error>> {
-    let auth = lemmy_auth(instance.clone()).await.unwrap();
-
-    let form = multipart::Form::new()
-        .text("name", name)
-        .text("community_id", "1716")
-        .text("body", body.unwrap())
-        .text("auth", auth)
-        .text("images[]", "https://i.pinimg.com/originals/f7/c0/e7/f7c0e76ef8fcf1c717364447e94a6702.jpg");
-
-    let client = Client::new();
-    let response = client
-        .post(format!("https://{}/api/v3/post", instance))
-        .multipart(form)
-        .send()
-        .await?;
-
-    if response.status().is_success() {
-        Ok("Successful post with image!".to_string())
-    } else {
-        Err(format!("Unsuccessful post. Status code: {}", response.status()).into())
-    }
-}
-
 pub async fn lemmy_auth(instance: String) -> Result<String, Box<dyn std::error::Error>> {
     let mut headers: HeaderMap = HeaderMap::new();
     headers.insert(
