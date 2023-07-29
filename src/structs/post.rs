@@ -1,5 +1,5 @@
-#[derive(Debug)]
-pub struct Post {
+#[derive(Debug, Clone)]
+pub struct RedditPost {
     pub title: String,
     pub ups: u64,
     pub over_18: bool,

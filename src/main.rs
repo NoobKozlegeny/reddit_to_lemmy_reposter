@@ -1,26 +1,31 @@
 // Import libraries
-use std::error::Error;
+use std::{error::Error, ops::{Deref, DerefMut}};
 use once_cell::sync::Lazy;
 use reqwest::Client;
 use url::Url;
 
 // Import own modules / Create module tree
-use crate::{api_callers::{reddit::reddit::reddit_get_posts, lemmy::lemmy::create_post}, structs::post::Post};
+use crate::{api_callers::{reddit::reddit::reddit_get_posts, lemmy::lemmy::create_post}, structs::post::RedditPost};
 pub mod api_callers;
 pub mod structs;
 pub mod statics;
 
 #[tokio::main]
 async fn main() {
-    // Get posts from subreddit
-    let posts: Result<Vec<Post>, Box<dyn Error>> = reddit_get_posts("fosttalicska", 3).await;
-    match &posts {
-        Ok(_) => println!("Successfully fetched posts!"),
+    // Get posts from subreddit and print the number of posts
+    let posts_result: Result<Vec<RedditPost>, Box<dyn Error>> = reddit_get_posts("fosttalicska", 3).await;
+    let mut posts: Vec<RedditPost> = Vec::new();
+    match &posts_result {
+        Ok(value) => {
+            println!("Successfully fetched posts!");
+            posts = value.clone();
+        },
         Err(err) => println!("{}", err),
     }
+    println!("{}", posts.len());
 
-    // Print the number of posts gathered
-    println!("{}", posts.as_ref().unwrap().iter().count());
+    // Filter these posts by upvote count
+    posts = posts.iter().filter(|post: &&RedditPost| post.ups >= 200).cloned().collect();
 
     // Create a post to Lemmy
     let post_response = create_post(

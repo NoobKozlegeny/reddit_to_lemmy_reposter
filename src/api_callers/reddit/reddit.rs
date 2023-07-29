@@ -1,11 +1,13 @@
+use std::error::Error;
+
 use serde_json::Value;
 
-use crate::structs::post::Post;
+use crate::structs::post::RedditPost;
 
 pub async fn reddit_get_posts(
     subreddit: &str,
     start_idx: usize,
-) -> Result<Vec<Post>, Box<dyn std::error::Error>> {
+) -> Result<Vec<RedditPost>, Box<dyn Error>> {
     // ...
     let url: String = format!("https://www.reddit.com/r/{}/hot.json", subreddit);
     let client = reqwest::Client::new();
@@ -26,9 +28,9 @@ pub async fn reddit_get_posts(
 
     // Return a Vector of Post struct objects if a successful response has been made
     if response_arr.is_some() {
-        let mut posts: Vec<Post> = Vec::new();
+        let mut posts: Vec<RedditPost> = Vec::new();
         for post in response_arr.unwrap().iter().skip(start_idx) {
-            posts.push(Post {
+            posts.push(RedditPost {
                 title: post["data"]["title"].to_string(),
                 ups: post["data"]["ups"].as_u64().unwrap(),
                 over_18: post["data"]["over_18"].as_bool().unwrap(),
