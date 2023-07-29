@@ -18,13 +18,10 @@ pub async fn create_post(
     // language_id: Option<LanguageId>
 ) -> Result<String, Box<dyn std::error::Error>> {
     // Get community_id
-    // let community_id_u64: u64 =
-    //     get_community_id("lemmy.basedcount.com".to_string(), instance.clone(), None)
-    //         .await
-    //         .unwrap();
-    // let community_id: CommunityId = CommunityId {
-    //     0: i32::try_from(1716)?,
-    // };
+    let community_id: u64 =
+        get_community_id("main".to_string(), instance.clone(), None)
+            .await
+            .unwrap();
     // Get auth code
     let auth = lemmy_auth(instance.clone())
         .await
@@ -43,7 +40,7 @@ pub async fn create_post(
     // Create CreatePost struct instance
     let params = json!({
         "name": name,
-        "community_id": 1716,
+        "community_id": community_id,
         "url": url.unwrap(),
         "body": body.unwrap(),
         "auth": auth,
@@ -104,28 +101,38 @@ pub async fn get_community_id(
     instance: String,
     auth: Option<Sensitive<String>>,
 ) -> Result<u64, Box<dyn std::error::Error>> {
-    let params = GetCommunity {
-        name: Some(name),
-        auth,
-        ..Default::default()
-    };
+    // Construct the search parameters
+    let params = json!({
+        "q": name.clone(),
+        "type_": "Communities",
+        "sort": "Hot",
+        "page": 1,
+        "limit": 1
+    });
 
+    // Send a GET request to the search endpoint
     let response = CLIENT
-        .get(format!("https://{}/api/v3/community", instance))
+        .get(format!("https://{}/api/v3/search", instance))
         .query(&params)
         .send()
         .await?;
 
+    // Check if the request was successful
     if response.status().is_success() {
-        let community_json: Value = serde_json::from_str(&response.text().await.unwrap())?;
-        println!("{:#?}", community_json);
-        let community_id = community_json["community_view"]["community"]["id"]
+        // Parse the response body as JSON
+        let search_json: Value = serde_json::from_str(&response.text().await.unwrap())?;
+        println!("{:#?}",search_json);
+        // Extract the community_id from the response
+        let community_id = search_json["communities"][0]["community"]["id"]
             .as_u64()
             .unwrap();
+
+        // Return the community_id
         return Ok(community_id);
     } else {
+        // If the request was not successful, return an error
         return Err(format!(
-            "Unsuccesful community request. Status code: {}",
+            "Failed community request. Status code: {}",
             response.status().as_str()
         )
         .to_owned())?;
