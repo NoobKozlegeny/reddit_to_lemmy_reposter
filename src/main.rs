@@ -43,7 +43,7 @@ async fn main() {
     let post_response = create_post(
         "lemmy.basedcount.com".to_owned(),
         "main".to_owned(),
-        "Owo 4".to_owned(),
+        "Owo 5".to_owned(),
         Some(Url::parse("https://i.pinimg.com/originals/f7/c0/e7/f7c0e76ef8fcf1c717364447e94a6702.jpg").unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
         Some("sniff sniff i-is that a BOY I smell? sniff sniff mmm yes I smell it! BOYSMELL!!!! I smell a boy! W-What is a boy doing here?!?! omygosh what am I gonna do?!?! THERE'S A BOY HERE! I'M FREAKING OUT SO MUCH!!!! calm down calm down and take a nice, deep breathe.... sniff sniff it smells so good! I love boysmell so much!!!! It makes me feel so amazing. I'm getting tingles all over from the delicious boyscent! It's driving me boyCRAZY!!!!!!".to_owned())
     ).await;
@@ -73,7 +73,7 @@ pub async fn create_post(
     let auth = lemmy_auth(instance.clone())
         .await
         .unwrap();
-    // println!("{}", auth.len());
+    println!("{}", auth);
 
     let mut headers: HeaderMap = HeaderMap::new();
     headers.insert(
@@ -92,6 +92,7 @@ pub async fn create_post(
         "body": body.unwrap(),
         "auth": auth,
     });
+    // println!("{:#?}", params);
     // Perform POST request
     let response = CLIENT
         .post(format!("https://{}/api/v3/post", instance))
@@ -163,7 +164,10 @@ pub async fn lemmy_auth(instance: String) -> Result<String, Box<dyn std::error::
     match response {
         Ok(value) => {
             let value_json: Value = serde_json::from_str(&value.text().await.ok().unwrap()[..])?;
-            return Ok(value_json["jwt"].to_string());
+            let mut jwt = value_json["jwt"].to_string();
+            jwt.remove(0);
+            jwt.remove(jwt.len() - 1);
+            return Ok(jwt);
         }
         Err(err) => return Err(err)?,
     }
