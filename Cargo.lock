@@ -1490,6 +1490,7 @@ dependencies = [
  "anyhow",
  "futures",
  "hyper",
+ "lazy_static",
  "lemmy_api_common",
  "net",
  "oauth2",

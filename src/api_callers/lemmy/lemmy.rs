@@ -1,11 +1,12 @@
 use std::{env, collections::HashMap};
 
 use hyper::{HeaderMap, http::HeaderValue};
+use lazy_static::__Deref;
 use lemmy_api_common::{sensitive::Sensitive, community::GetCommunity};
 use serde_json::{json, Value};
 use url::Url;
 
-use crate::statics::CLIENT;
+use crate::statics::{CLIENT, HEADERS};
 
 pub async fn create_post(
     instance: String,
@@ -28,15 +29,6 @@ pub async fn create_post(
         .unwrap();
     println!("{}", auth);
 
-    let mut headers: HeaderMap = HeaderMap::new();
-    headers.insert(
-        "Content-Type",
-        HeaderValue::from_str("application/json").unwrap(),
-    );
-    headers.insert(
-        "User-Agent",
-        HeaderValue::from_str("reddit_to_lemmy_reposter (by u/PrivateNoob@sopuli.xyz)").unwrap(),
-    );
     // Create CreatePost struct instance
     let params = json!({
         "name": name,
@@ -45,11 +37,10 @@ pub async fn create_post(
         "body": body.unwrap(),
         "auth": auth,
     });
-    // println!("{:#?}", params);
     // Perform POST request
     let response = CLIENT
         .post(format!("https://{}/api/v3/post", instance))
-        .headers(headers)
+        .headers(HEADERS.deref().clone())
         .json(&params)
         .send()
         .await;
@@ -59,16 +50,6 @@ pub async fn create_post(
 }
 
 pub async fn lemmy_auth(instance: String) -> Result<String, Box<dyn std::error::Error>> {
-    let mut headers: HeaderMap = HeaderMap::new();
-    headers.insert(
-        "Content-Type",
-        HeaderValue::from_str("application/json").unwrap(),
-    );
-    headers.insert(
-        "User-Agent",
-        HeaderValue::from_str("reddit_to_lemmy_reposter (by u/PrivateNoob@sopuli.xyz)").unwrap(),
-    );
-
     // Get credentials from environemnt (export LEMMY_AUTH_PASSWORD=secretpassword)
     let username_or_email = env::var("NAME_OR_EMAIL").expect("NAME_OR_EMAIL must be set");
     let password = env::var("LEMMY_AUTH_PASSWORD").expect("LEMMY_AUTH_PASSWORD must be set");
@@ -79,7 +60,7 @@ pub async fn lemmy_auth(instance: String) -> Result<String, Box<dyn std::error::
 
     let response = CLIENT
         .post(format!("https://{}/api/v3/user/login", instance))
-        .headers(headers)
+        .headers(HEADERS.deref().clone())
         .json(&params)
         .send()
         .await;
@@ -113,6 +94,7 @@ pub async fn get_community_id(
     // Send a GET request to the search endpoint
     let response = CLIENT
         .get(format!("https://{}/api/v3/search", instance))
+        .headers(HEADERS.deref().clone())
         .query(&params)
         .send()
         .await?;
