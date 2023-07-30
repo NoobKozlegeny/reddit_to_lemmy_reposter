@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env};
+use std::{collections::HashMap, env, path::Path, fs::{File, OpenOptions}, io::{BufWriter, Write}};
 
 use hyper::{http::HeaderValue, HeaderMap};
 use lazy_static::__Deref;
@@ -17,6 +17,7 @@ pub async fn create_posts(instance: String, community: String, posts: Vec<Reddit
         let response = create_post(
         instance.clone(),
         community.clone(),
+        post.id,
         post.title,
         Some(Url::parse(&post.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
         Some(format!("Beep boop egy robot vagyok.
@@ -31,6 +32,7 @@ pub async fn create_posts(instance: String, community: String, posts: Vec<Reddit
 pub async fn create_post(
     instance: String,
     community: String,
+    id: String,
     name: String,
     url: Option<Url>,
     body: Option<String>,
@@ -54,6 +56,7 @@ pub async fn create_post(
         "body": body.unwrap(),
         "auth": auth,
     });
+
     // Perform POST request
     let response = CLIENT
         .post(format!("https://{}/api/v3/post", instance))
@@ -62,6 +65,7 @@ pub async fn create_post(
         .send()
         .await?;
 
+    // Return something based on success or fail
     if response.status().is_client_error() {
         return Err(format!(
             "Client Error when creating post. Status code: {}",
@@ -73,6 +77,8 @@ pub async fn create_post(
             response.status().as_str()
         ))?;
     } else {
+        // Write the id to file
+        write_to_file(Path::new("posted_to_lemmy.txt"), id);
         return Ok("Successful post!".to_string());
     }
 }
@@ -147,4 +153,21 @@ pub async fn get_community_id(
         )
         .to_owned())?;
     }
+}
+
+fn write_to_file(path: &Path, id: String) {
+    // Open file in append mode
+    let mut file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(path)
+        .unwrap();
+
+    let _ = file.write(b"\n");
+    let write_result = file.write_all(id.as_bytes());
+
+    if write_result.is_err() {
+        println!("Error with writing {:#?}", write_result.err());
+    }
+    println!("ff");
 }
