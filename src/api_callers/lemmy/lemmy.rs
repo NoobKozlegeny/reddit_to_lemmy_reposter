@@ -30,9 +30,6 @@ pub async fn create_multiple_post(instance: String, community: String, posts: Ve
 }
 
 pub async fn create_one_post(instance: String, community: String, post: Option<RedditPost>) -> Option<String> {
-    if post.is_none() {
-        return None;
-    }
     let post_some = post?;
     let response = create_post(
         instance.clone(),
@@ -45,7 +42,12 @@ pub async fn create_one_post(instance: String, community: String, post: Option<R
         Eredeti fostoló: {}", post_some.author).to_owned())
         ).await;
 
+    if response.is_ok() {
         return Some("1 post have been posted".to_string());
+    }
+    else {
+        return None;
+    }   
 }
 
 async fn create_post(
@@ -117,15 +119,16 @@ pub async fn lemmy_auth(instance: String) -> Result<String, Box<dyn std::error::
         .send()
         .await;
 
-    match response {
-        Ok(value) => {
-            let value_json: Value = serde_json::from_str(&value.text().await.ok().unwrap()[..])?;
-            let mut jwt = value_json["jwt"].to_string();
-            jwt.remove(0);
-            jwt.remove(jwt.len() - 1);
-            return Ok(jwt);
-        }
-        Err(err) => return Err(err)?,
+    let response_unwrapped = response?;
+    if response_unwrapped.status().is_success() {
+        let value_json: Value = serde_json::from_str(&response_unwrapped.text().await.ok().unwrap()[..])?;
+        let mut jwt = value_json["jwt"].to_string();
+        jwt.remove(0);
+        jwt.remove(jwt.len() - 1);
+        return Ok(jwt);
+    }
+    else {
+        return Err("Failed authorization!".into());
     }
 }
 
