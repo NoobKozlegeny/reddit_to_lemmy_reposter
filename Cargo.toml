@@ -16,7 +16,6 @@ url = "2.4.0"
 oauth2 = "4.4.1"
 net = "0.1.0"
 open = "5.0.0"
-anyhow = "1.0.71"
 hyper = { version = "0.14.27", features = ["server"] }
 lemmy_api_common = "0.18.2"
 reqwest-middleware = "0.2.2"

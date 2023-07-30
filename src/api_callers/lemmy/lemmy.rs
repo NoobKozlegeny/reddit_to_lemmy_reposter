@@ -1,12 +1,32 @@
-use std::{env, collections::HashMap};
+use std::{collections::HashMap, env};
 
-use hyper::{HeaderMap, http::HeaderValue};
+use hyper::{http::HeaderValue, HeaderMap};
 use lazy_static::__Deref;
-use lemmy_api_common::{sensitive::Sensitive, community::GetCommunity};
+use lemmy_api_common::{community::GetCommunity, sensitive::Sensitive};
+use oauth2::reqwest::HttpClientError;
 use serde_json::{json, Value};
 use url::Url;
 
-use crate::statics::{CLIENT, HEADERS};
+use crate::{
+    statics::{CLIENT, HEADERS},
+    structs::post::RedditPost,
+};
+
+pub async fn create_posts(instance: String, community: String, posts: Vec<RedditPost>) -> String {
+    for post in posts.clone() {
+        let response = create_post(
+        instance.clone(),
+        community.clone(),
+        post.title,
+        Some(Url::parse(&post.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
+        Some(format!("Beep boop egy robot vagyok.
+        
+        Eredeti fostoló: {}", post.author).to_owned())
+        ).await;
+    }
+
+    return format!("{} posts have been posted", posts.len().to_string());
+}
 
 pub async fn create_post(
     instance: String,
@@ -19,14 +39,11 @@ pub async fn create_post(
     // language_id: Option<LanguageId>
 ) -> Result<String, Box<dyn std::error::Error>> {
     // Get community_id
-    let community_id: u64 =
-        get_community_id("main".to_string(), instance.clone(), None)
-            .await
-            .unwrap();
-    // Get auth code
-    let auth = lemmy_auth(instance.clone())
+    let community_id: u64 = get_community_id("main".to_string(), instance.clone(), None)
         .await
         .unwrap();
+    // Get auth code
+    let auth = lemmy_auth(instance.clone()).await.unwrap();
     println!("{}", auth);
 
     // Create CreatePost struct instance
@@ -43,10 +60,21 @@ pub async fn create_post(
         .headers(HEADERS.deref().clone())
         .json(&params)
         .send()
-        .await;
-    let kek = response.unwrap().text().await.unwrap();
+        .await?;
 
-    return Ok("Successful post!".to_string());
+    if response.status().is_client_error() {
+        return Err(format!(
+            "Client Error when creating post. Status code: {}",
+            response.status().as_str()
+        ))?;
+    } else if response.status().is_server_error() {
+        return Err(format!(
+            "Server Error when creating post. Status code: {}",
+            response.status().as_str()
+        ))?;
+    } else {
+        return Ok("Successful post!".to_string());
+    }
 }
 
 pub async fn lemmy_auth(instance: String) -> Result<String, Box<dyn std::error::Error>> {
@@ -103,7 +131,7 @@ pub async fn get_community_id(
     if response.status().is_success() {
         // Parse the response body as JSON
         let search_json: Value = serde_json::from_str(&response.text().await.unwrap())?;
-        println!("{:#?}",search_json);
+        println!("{:#?}", search_json);
         // Extract the community_id from the response
         let community_id = search_json["communities"][0]["community"]["id"]
             .as_u64()

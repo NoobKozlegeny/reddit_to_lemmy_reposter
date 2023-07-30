@@ -1487,7 +1487,6 @@ dependencies = [
 name = "reddit_to_lemmy_reposter"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "futures",
  "hyper",
  "lazy_static",
