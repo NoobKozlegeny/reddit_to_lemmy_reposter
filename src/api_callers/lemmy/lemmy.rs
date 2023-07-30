@@ -60,7 +60,7 @@ async fn create_post(
     // language_id: Option<LanguageId>
 ) -> Result<String, Box<dyn std::error::Error>> {
     // Get community_id
-    let community_id: u64 = get_community_id("main".to_string(), instance.clone(), None)
+    let community_id: u64 = get_community_id(community, instance.clone(), None)
         .await
         .unwrap();
     // Get auth code

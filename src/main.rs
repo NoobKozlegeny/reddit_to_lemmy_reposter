@@ -43,7 +43,7 @@ async fn main() {
     // let posted_amount = create_posts("lemmy.basedcount.com".to_string(), "main".to_string(), posts_filtered).await;
     let posted_amount = create_one_post(
         "lemmy.basedcount.com".to_string(),
-        "main".to_string(),
+        "fosttalicska".to_string(),
         posts_filtered.first().cloned(),
     ).await;
     match posted_amount {
