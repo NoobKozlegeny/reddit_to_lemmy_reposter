@@ -31,12 +31,12 @@ pub async fn reddit_get_posts(
         let mut posts: Vec<RedditPost> = Vec::new();
         for post in response_arr.unwrap().iter().skip(start_idx) {
             posts.push(RedditPost {
-                title: post["data"]["title"].to_string(),
+                title: post["data"]["title"].as_str().unwrap().to_string(),
                 ups: post["data"]["ups"].as_u64().unwrap(),
                 over_18: post["data"]["over_18"].as_bool().unwrap(),
-                author: post["data"]["author"].to_string(),
-                url: post["data"]["url"].to_string(),
-                id: post["data"]["id"].to_string(),
+                author: post["data"]["author"].as_str().unwrap().to_string(),
+                url: post["data"]["url"].as_str().unwrap().to_string(),
+                id: post["data"]["id"].as_str().unwrap().to_string(),
             });
         }
         return Ok(posts);
