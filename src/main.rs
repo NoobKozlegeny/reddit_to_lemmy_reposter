@@ -44,9 +44,12 @@ async fn main() {
     let posted_amount = create_one_post(
         "lemmy.basedcount.com".to_string(),
         "main".to_string(),
-        posts_filtered[0].clone(),
+        posts_filtered.first().cloned(),
     ).await;
-    println!("{}", posted_amount);
+    match posted_amount {
+        Some(value) => println!("{}", value),
+        None => println!("No new content to post")
+    }
 }
 
 fn reddit_filter_posts(mut posts: Vec<RedditPost>) -> Vec<RedditPost> {
