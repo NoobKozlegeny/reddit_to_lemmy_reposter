@@ -61,7 +61,6 @@ async fn create_post(
         .unwrap();
     // Get auth code
     let auth = lemmy_auth(instance.clone()).await.unwrap();
-    println!("{}", auth);
 
     // Create CreatePost struct instance
     let params = json!({
@@ -152,7 +151,6 @@ pub async fn get_community_id(
     if response.status().is_success() {
         // Parse the response body as JSON
         let search_json: Value = serde_json::from_str(&response.text().await.unwrap())?;
-        println!("{:#?}", search_json);
         // Extract the community_id from the response
         let community_id = search_json["communities"][0]["community"]["id"]
             .as_u64()
