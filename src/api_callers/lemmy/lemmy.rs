@@ -12,7 +12,7 @@ use crate::{
     structs::post::RedditPost,
 };
 
-pub async fn create_posts(instance: String, community: String, posts: Vec<RedditPost>) -> String {
+pub async fn create_multiple_post(instance: String, community: String, posts: Vec<RedditPost>) -> String {
     for post in posts.clone() {
         let response = create_post(
         instance.clone(),
@@ -29,7 +29,22 @@ pub async fn create_posts(instance: String, community: String, posts: Vec<Reddit
     return format!("{} posts have been posted", posts.len().to_string());
 }
 
-pub async fn create_post(
+pub async fn create_one_post(instance: String, community: String, post: RedditPost) -> String {
+    let response = create_post(
+        instance.clone(),
+        community.clone(),
+        post.id,
+        post.title,
+        Some(Url::parse(&post.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
+        Some(format!("Beep boop egy robot vagyok.
+        
+        Eredeti fostoló: {}", post.author).to_owned())
+        ).await;
+
+        return "1 post have been posted".to_string();
+}
+
+async fn create_post(
     instance: String,
     community: String,
     id: String,
@@ -169,5 +184,4 @@ fn write_to_file(path: &Path, id: String) {
     if write_result.is_err() {
         println!("Error with writing {:#?}", write_result.err());
     }
-    println!("ff");
 }
