@@ -20,8 +20,7 @@ pub async fn create_multiple_post(instance: String, community: String, posts: Ve
         post.id,
         post.title,
         Some(Url::parse(&post.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
-        Some(format!("Beep boop egy robot vagyok.
-        
+        Some(format!("Beep boop egy robot vagyok. \n
         Eredeti fostoló: {}", post.author).to_owned())
         ).await;
     }
@@ -37,8 +36,7 @@ pub async fn create_one_post(instance: String, community: String, post: Option<R
         post_some.id,
         post_some.title,
         Some(Url::parse(&post_some.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
-        Some(format!("Beep boop egy robot vagyok.
-        
+        Some(format!("Beep boop egy robot vagyok. \n
         Eredeti fostoló: {}", post_some.author).to_owned())
         ).await;
 

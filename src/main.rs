@@ -1,3 +1,4 @@
+use clap::Parser;
 // Import libraries
 use once_cell::sync::Lazy;
 use reqwest::Client;
@@ -17,13 +18,21 @@ use crate::{
         reddit::reddit::reddit_get_posts,
     },
     structs::post::RedditPost,
+    command_args::CommandArgs
 };
 pub mod api_callers;
 pub mod statics;
 pub mod structs;
+pub mod command_args;
 
 #[tokio::main]
 async fn main() {
+    // Obtaining cmd arguemnts
+    let cmd_args = CommandArgs::parse();
+
+    println!("Instance: {}", cmd_args.instance); 
+    println!("Community: {}", cmd_args.community); 
+
     // Get posts from subreddit and print the number of posts
     let posts_result: Result<Vec<RedditPost>, Box<dyn Error>> =
         reddit_get_posts("fosttalicska", 3).await;
