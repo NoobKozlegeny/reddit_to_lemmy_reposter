@@ -96,7 +96,7 @@ async fn create_post(
         ))?;
     } else {
         // Write the id to file
-        write_to_file(Path::new(&format!("{}.txt", community)), id);
+        write_to_file(Path::new(&format!("communities/{}.txt", community)), id);
         return Ok("Successful post!".to_string());
     }
 }

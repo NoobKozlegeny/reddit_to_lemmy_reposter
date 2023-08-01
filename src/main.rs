@@ -65,7 +65,7 @@ fn reddit_filter_posts(mut posts: Vec<RedditPost>) -> Vec<RedditPost> {
 
     // Check if the post have already been posted to Lemmy
     posts = posts
-        .reddit_filter_posted(Path::new(&format!("{}.txt", CMD_ARGS.community)))
+        .reddit_filter_posted(Path::new(&format!("communities/{}.txt", CMD_ARGS.community)))
         .unwrap()
         .to_owned();
 
