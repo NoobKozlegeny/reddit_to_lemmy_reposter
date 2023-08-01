@@ -60,7 +60,7 @@ async fn create_post(
     // language_id: Option<LanguageId>
 ) -> Result<String, Box<dyn std::error::Error>> {
     // Get community_id
-    let community_id: u64 = get_community_id(community, instance.clone(), None)
+    let community_id: u64 = get_community_id(community.clone(), instance.clone(), None)
         .await
         .unwrap();
     // Get auth code
@@ -96,7 +96,7 @@ async fn create_post(
         ))?;
     } else {
         // Write the id to file
-        write_to_file(Path::new("posted_to_lemmy.txt"), id);
+        write_to_file(Path::new(&format!("{}.txt", community)), id);
         return Ok("Successful post!".to_string());
     }
 }
