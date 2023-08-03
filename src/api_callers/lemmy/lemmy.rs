@@ -36,8 +36,8 @@ pub async fn create_one_post(instance: String, community: String, post: Option<R
         post_some.id,
         post_some.title,
         Some(Url::parse(&post_some.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
-        Some(format!("Beep boop egy robot vagyok. \n
-        Eredeti fostoló: {}", post_some.author).to_owned())
+        Some(format!("Beep boop I'm a bot OwO \n
+        Original poster: u/{} from Reddit \n", post_some.author).to_owned())
         ).await;
 
     if response.is_ok() {
