@@ -1,7 +1,4 @@
-use clap::Parser;
 // Import libraries
-use once_cell::sync::Lazy;
-use reqwest::Client;
 use statics::CMD_ARGS;
 use std::{
     error::Error,
@@ -10,7 +7,6 @@ use std::{
     path::Path,
 };
 use structs::post::RedditPostExt;
-use url::Url;
 
 // Import own modules / Create module tree
 use crate::{

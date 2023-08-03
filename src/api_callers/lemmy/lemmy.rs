@@ -1,9 +1,7 @@
 use std::{collections::HashMap, env, path::Path, fs::{File, OpenOptions}, io::{BufWriter, Write}};
 
-use hyper::{http::HeaderValue, HeaderMap};
 use lazy_static::__Deref;
 use lemmy_api_common::{community::GetCommunity, sensitive::Sensitive};
-use oauth2::reqwest::HttpClientError;
 use serde_json::{json, Value};
 use url::Url;
 
