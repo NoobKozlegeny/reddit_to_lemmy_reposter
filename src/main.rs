@@ -2,9 +2,9 @@
 use statics::CMD_ARGS;
 use std::{
     error::Error,
-    fs,
+    fs::{self, create_dir_all},
     ops::{Deref, DerefMut},
-    path::Path,
+    path::{Path, PathBuf},
 };
 use structs::post::RedditPostExt;
 
@@ -35,8 +35,11 @@ async fn main() {
         Err(err) => println!("{}", err),
     }
 
+    // Create PATH to access communities txt file. The files are stored in the user's directory
+    let path = assemble_communities_file_path().unwrap();
+
     // Filter these posts by upvote count
-    let posts_filtered: Vec<RedditPost> = reddit_filter_posts(posts);
+    let posts_filtered: Vec<RedditPost> = reddit_filter_posts(posts, path.clone());
 
     // Post to Lemmy
     // let posted_amount = create_posts("lemmy.basedcount.com".to_string(), "main".to_string(), posts_filtered).await;
@@ -44,6 +47,7 @@ async fn main() {
         CMD_ARGS.instance.clone(),
         CMD_ARGS.community.clone(),
         posts_filtered.first().cloned(),
+        path
     ).await;
     match posted_amount {
         Some(value) => println!("{}", value),
@@ -51,7 +55,7 @@ async fn main() {
     }
 }
 
-fn reddit_filter_posts(mut posts: Vec<RedditPost>) -> Vec<RedditPost> {
+fn reddit_filter_posts(mut posts: Vec<RedditPost>, path: PathBuf) -> Vec<RedditPost> {
     // Filter posts by upvotes
     posts = posts
         .iter()
@@ -61,9 +65,18 @@ fn reddit_filter_posts(mut posts: Vec<RedditPost>) -> Vec<RedditPost> {
 
     // Check if the post have already been posted to Lemmy
     posts = posts
-        .reddit_filter_posted(Path::new(&format!("communities/{}.txt", CMD_ARGS.community)))
+        .reddit_filter_posted(path.join(&format!("{}.txt", CMD_ARGS.community)))
         .unwrap()
         .to_owned();
 
     return posts;
+}
+
+fn assemble_communities_file_path() -> Option<PathBuf> {
+    let home_dir = home::home_dir().unwrap().to_str().unwrap().to_owned();
+    let path_str = format!("{}/Documents/reddit_to_lemmy_reposter/communities/{}.txt", home_dir, CMD_ARGS.community);
+    let _ = create_dir_all(path_str.clone());
+    let path = PathBuf::from(path_str);
+    
+    return Some(path);
 }

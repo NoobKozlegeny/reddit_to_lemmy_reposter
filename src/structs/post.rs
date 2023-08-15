@@ -2,7 +2,7 @@ use std::{
     error::Error,
     fs::{self, File, OpenOptions},
     io::{BufRead, BufReader},
-    path::Path,
+    path::{Path, PathBuf}, os, env,
 };
 
 #[derive(Debug, Clone)]
@@ -16,12 +16,14 @@ pub struct RedditPost {
 }
 
 pub trait RedditPostExt {
-    fn reddit_filter_posted(&mut self, path: &Path) -> Result<&mut Self, Box<dyn Error>>;
+    fn reddit_filter_posted(&mut self, path: PathBuf) -> Result<&mut Self, Box<dyn Error>>;
 }
 
 impl RedditPostExt for Vec<RedditPost> {
-    fn reddit_filter_posted(&mut self, path: &Path) -> Result<&mut Self, Box<dyn Error>> {
+    fn reddit_filter_posted(&mut self, path: PathBuf) -> Result<&mut Self, Box<dyn Error>> {
         // Read file and create a reader
+        println!("Current Path: {:?}", env::current_dir());
+        println!("File Path: {:?}", path.as_os_str());
         let file = OpenOptions::new()
             .read(true)
             .write(true)

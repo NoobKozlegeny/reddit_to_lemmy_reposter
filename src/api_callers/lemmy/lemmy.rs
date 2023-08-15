@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, path::Path, fs::{File, OpenOptions}, io::{BufWriter, Write}};
+use std::{collections::HashMap, env, path::{Path, PathBuf}, fs::{File, OpenOptions}, io::{BufWriter, Write}};
 
 use lazy_static::__Deref;
 use lemmy_api_common::{community::GetCommunity, sensitive::Sensitive};
@@ -10,7 +10,7 @@ use crate::{
     structs::post::RedditPost,
 };
 
-pub async fn create_multiple_post(instance: String, community: String, posts: Vec<RedditPost>) -> String {
+pub async fn create_multiple_post(instance: String, community: String, posts: Vec<RedditPost>, path: PathBuf) -> String {
     for post in posts.clone() {
         let response = create_post(
         instance.clone(),
@@ -19,14 +19,15 @@ pub async fn create_multiple_post(instance: String, community: String, posts: Ve
         post.title,
         Some(Url::parse(&post.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
         Some(format!("Beep boop egy robot vagyok. \n
-        Eredeti fostoló: {}", post.author).to_owned())
+        Eredeti fostoló: {}", post.author).to_owned()),
+        path.to_owned()
         ).await;
     }
 
     return format!("{} posts have been posted", posts.len().to_string());
 }
 
-pub async fn create_one_post(instance: String, community: String, post: Option<RedditPost>) -> Option<String> {
+pub async fn create_one_post(instance: String, community: String, post: Option<RedditPost>, path: PathBuf) -> Option<String> {
     let post_some = post?;
     let response = create_post(
         instance.clone(),
@@ -35,7 +36,8 @@ pub async fn create_one_post(instance: String, community: String, post: Option<R
         post_some.title,
         Some(Url::parse(&post_some.url[..]).unwrap()), // Some(Url::parse("https://hu.pinterest.com/pin/503769908335656123/").unwrap()),
         Some(format!("Beep boop I'm a bot OwO \n
-        Original poster: u/{} from Reddit \n", post_some.author).to_owned())
+        Original poster: u/{} from Reddit \n", post_some.author).to_owned()),
+        path
         ).await;
 
     if response.is_ok() {
@@ -56,6 +58,7 @@ async fn create_post(
     // honeypot: Option<String>,
     // nsfw: Option<bool>,
     // language_id: Option<LanguageId>
+    path: PathBuf
 ) -> Result<String, Box<dyn std::error::Error>> {
     // Get community_id
     let community_id: u64 = get_community_id(community.clone(), instance.clone(), None)
@@ -94,7 +97,7 @@ async fn create_post(
         ))?;
     } else {
         // Write the id to file
-        write_to_file(Path::new(&format!("communities/{}.txt", community)), id);
+        write_to_file(&path, id);
         return Ok("Successful post!".to_string());
     }
 }
@@ -172,6 +175,8 @@ pub async fn get_community_id(
 }
 
 fn write_to_file(path: &Path, id: String) {
+    println!("Path: {:?}", path);
+    println!("Current Path: {:?}", env::current_dir());
     // Open file in append mode
     let mut file = OpenOptions::new()
         .append(true)
