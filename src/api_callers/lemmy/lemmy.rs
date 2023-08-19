@@ -179,8 +179,8 @@ fn write_to_file(path: &Path, id: String) {
     println!("Current Path: {:?}", env::current_dir());
     // Open file in append mode
     let mut file = OpenOptions::new()
-        .append(true)
         .create(true)
+        .append(true)
         .open(path)
         .unwrap();
 

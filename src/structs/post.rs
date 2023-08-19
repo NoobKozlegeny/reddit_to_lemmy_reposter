@@ -22,8 +22,8 @@ pub trait RedditPostExt {
 impl RedditPostExt for Vec<RedditPost> {
     fn reddit_filter_posted(&mut self, path: PathBuf) -> Result<&mut Self, Box<dyn Error>> {
         // Read file and create a reader
-        println!("Current Path: {:?}", env::current_dir());
-        println!("File Path: {:?}", path.as_os_str());
+        // println!("Current Path: {:?}", env::current_dir());
+        // println!("File Path: {:?}", path.as_os_str());
         let file = OpenOptions::new()
             .read(true)
             .write(true)

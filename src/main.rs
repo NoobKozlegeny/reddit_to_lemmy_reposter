@@ -65,7 +65,7 @@ fn reddit_filter_posts(mut posts: Vec<RedditPost>, path: PathBuf) -> Vec<RedditP
 
     // Check if the post have already been posted to Lemmy
     posts = posts
-        .reddit_filter_posted(path.join(&format!("{}.txt", CMD_ARGS.community)))
+        .reddit_filter_posted(path)
         .unwrap()
         .to_owned();
 
@@ -74,9 +74,9 @@ fn reddit_filter_posts(mut posts: Vec<RedditPost>, path: PathBuf) -> Vec<RedditP
 
 fn assemble_communities_file_path() -> Option<PathBuf> {
     let home_dir = home::home_dir().unwrap().to_str().unwrap().to_owned();
-    let path_str = format!("{}/Documents/reddit_to_lemmy_reposter/communities/{}.txt", home_dir, CMD_ARGS.community);
+    let path_str = format!("{}/Documents/reddit_to_lemmy_reposter/communities", home_dir);
     let _ = create_dir_all(path_str.clone());
-    let path = PathBuf::from(path_str);
+    let path = PathBuf::from(format!("{}/{}.txt", path_str, CMD_ARGS.community));
     
     return Some(path);
 }
