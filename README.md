@@ -1,5 +1,5 @@
 # What is this?
-A script which reposts one or more posts to a Lemmy community from a selected subreddit. In construction currently.
+A script which reposts one post to a Lemmy community from a selected subreddit. In construction currently.
 
 Only posts that have atleast 200 upvotes can be reposted and whenever a post is made, a "reddit_to_lemmy_reposter" folder will be created in the user's Documents folder to store already posted posts's ids in a textfile to avoid duplicates.
 
