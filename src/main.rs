@@ -19,7 +19,6 @@ use crate::{
 pub mod api_callers;
 pub mod statics;
 pub mod structs;
-pub mod command_args;
 
 #[tokio::main]
 async fn main() {
@@ -39,7 +38,7 @@ async fn main() {
     let path = assemble_communities_file_path().unwrap();
 
     // Filter these posts by upvote count
-    let posts_filtered: Vec<RedditPost> = reddit_filter_posts(posts, path.clone());
+    let posts_filtered: Vec<RedditPost> = reddit_filter_posts(posts, path.clone(), CMD_ARGS.min_ups, CMD_ARGS.min_ups);
 
     // Post to Lemmy
     // let posted_amount = create_posts("lemmy.basedcount.com".to_string(), "main".to_string(), posts_filtered).await;
@@ -55,11 +54,11 @@ async fn main() {
     }
 }
 
-fn reddit_filter_posts(mut posts: Vec<RedditPost>, path: PathBuf) -> Vec<RedditPost> {
+fn reddit_filter_posts(mut posts: Vec<RedditPost>, path: PathBuf, min_ups: Option<u64>, max_ups: Option<u64>) -> Vec<RedditPost> {
     // Filter posts by upvotes
     posts = posts
         .iter()
-        .filter(|post: &&RedditPost| post.ups >= 200)
+        .filter(|post: &&RedditPost| post.ups >= min_ups.unwrap_or(0) && post.ups <= max_ups.unwrap_or(u64::MAX))
         .cloned()
         .collect();
 

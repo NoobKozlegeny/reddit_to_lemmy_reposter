@@ -3,7 +3,7 @@ use hyper::{http::HeaderValue, HeaderMap};
 use once_cell::sync::Lazy;
 use reqwest::Client;
 
-use crate::command_args::CommandArgs;
+use crate::structs::command_args::CommandArgs;
 
 pub static CLIENT: Lazy<Client> = Lazy::new(|| {
     Client::new()
