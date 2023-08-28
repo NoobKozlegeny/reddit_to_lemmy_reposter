@@ -1,7 +1,6 @@
-use std::{collections::HashMap, env, path::{Path, PathBuf}, fs::{File, OpenOptions}, io::{BufWriter, Write}};
-
+use std::{collections::HashMap, env, path::{Path, PathBuf}, fs::OpenOptions, io::Write};
 use lazy_static::__Deref;
-use lemmy_api_common::{community::GetCommunity, sensitive::Sensitive};
+use lemmy_api_common::sensitive::Sensitive;
 use serde_json::{json, Value};
 use url::Url;
 

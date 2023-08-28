@@ -2,19 +2,17 @@
 use statics::CMD_ARGS;
 use std::{
     error::Error,
-    fs::{self, create_dir_all},
-    ops::{Deref, DerefMut},
-    path::{Path, PathBuf},
+    fs::create_dir_all,
+    path::PathBuf,
 };
-use structs::post::RedditPostExt;
 
 // Import own modules / Create module tree
 use crate::{
     api_callers::{
-        lemmy::lemmy::{create_multiple_post, create_one_post},
+        lemmy::lemmy::create_one_post,
         reddit::reddit::reddit_get_posts,
     },
-    structs::post::RedditPost,
+    structs::post::*,
 };
 pub mod api_callers;
 pub mod statics;
